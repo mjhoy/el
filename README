@@ -1,0 +1,11 @@
+el
+--
+
+DEPENDENCIES
+
+  ncurses (wide-character support)
+
+INSTALL
+
+  run `make` in this directory.
+  You should now have an el executable.

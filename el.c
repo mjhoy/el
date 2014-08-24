@@ -21,8 +21,11 @@ const char *main_map =
       "   #########    "
       "                ";
 
+void print_command_line(int row);
+
 void
 render_map(Map *map) {
+      int maxx, maxy;
       int i, j;
       char cur;
       clear();
@@ -47,10 +50,8 @@ render_map(Map *map) {
             }
             printw("\n");
       }
-      mvprintw(
-            map->h + 3,
-            0,
-            "h l ");
+      getmaxyx(stdscr, maxy, maxx);
+      print_command_line(maxy - 2);
       refresh();
 }
 
@@ -76,6 +77,24 @@ intro() {
 
       refresh();
       getch();
+}
+
+void
+print_command_line(int row) {
+      mvprintw(row,0, "------------------------------");
+      row = row + 1;
+
+      mvprintw(row, 0, "movement ");
+      attron(A_BOLD);
+      mvprintw(row,9,"h j k l"); attroff(A_BOLD);
+
+      mvprintw(row, 16, " help ");
+      attron(A_BOLD);
+      mvprintw(row,22,"?"); attroff(A_BOLD);
+
+      mvprintw(row, 23, " quit ");
+      attron(A_BOLD);
+      mvprintw(row,29,"q"); attroff(A_BOLD);
 }
 
 int

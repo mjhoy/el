@@ -105,7 +105,8 @@ main() {
                   break;
             }
       }
-
+      map_destroy(map);
       endwin();
+
       return 0;
 }

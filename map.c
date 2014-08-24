@@ -27,7 +27,8 @@ map_create(const char *data, int width, int height) {
 }
 
 void
-map_destroy(Map *map) {
+map_destroy(Map *map) {      
+      if(map->data) free(map->data);
       free(map);
 }
 

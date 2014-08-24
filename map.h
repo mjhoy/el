@@ -2,7 +2,7 @@
 #define __map_h__
 
 typedef struct Map {
-      const char *data;
+      char *data;
       int w;
       int h;
       int pos;

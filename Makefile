@@ -1,6 +1,6 @@
 CFLAGS=-g -Wall
 LDFLAGS=-lncurses
-OBJECTS=el.o map.o
+OBJECTS=el.o map.o log.o ui.o level1.o
 
 el: $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o el $(LDFLAGS)

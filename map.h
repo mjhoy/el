@@ -1,11 +1,14 @@
 #ifndef __map_h__
 #define __map_h__
 
+typedef int (*eventFn)(void *map);
+
 typedef struct Map {
       char *data;
       int w;
       int h;
       int pos;
+      eventFn events[5];
 } Map;
 
 Map* map_create(const char *data, int width, int height);

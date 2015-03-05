@@ -1,9 +1,17 @@
 el
 --
 
+
+DESCRIPTION
+
+  a silly little project in which I practice c fundamentals &
+  explore the linux API.
+
+
 DEPENDENCIES
 
   ncurses (wide-character support)
+
 
 INSTALL
 

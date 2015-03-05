@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <pwd.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "map.h"
 #include "dbg.h"
@@ -27,6 +28,35 @@ const char *main_map =
       "   # L     #    "
       "   #########    "
       "                ";
+
+void
+tellmeaboutthedate()
+{
+    int row, col;
+
+    time_t t;
+    struct tm loc;
+    struct tm *locp;
+
+    t = time(NULL);
+
+    locp = localtime(&t);
+    loc = *locp;
+
+    getmaxyx(stdscr, row, col);
+    clear();
+
+    mvprintw(
+        row-3,
+        0,
+        "just so you know it has been %d days since the year began.", loc.tm_yday);
+    mvprintw(
+        row-2,
+        0,
+        "(hit a key to continue)");
+    refresh();
+    getch();
+}
 
 void
 setupname()
@@ -94,6 +124,7 @@ intro() {
     getch();
 
     setupname();
+    tellmeaboutthedate();
 }
 
 int

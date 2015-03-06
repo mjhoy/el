@@ -1,7 +1,12 @@
 #include "name.h"
 #include <limits.h>
 
-static char name[NAME_MAX];
+/* LOGIN_NAME_MAX not defined on OSX... hmm... */
+#ifndef LOGIN_NAME_MAX
+#define LOGIN_NAME_MAX 255
+#endif
+
+static char name[LOGIN_NAME_MAX];
 
 char *
 getName()

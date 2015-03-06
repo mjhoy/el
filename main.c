@@ -76,7 +76,19 @@ setupname()
     pwd  = getpwuid(euid);    /* passwd struct */
     strncpy(default_name, pwd->pw_name, 29);
     default_name[29] = '\0';
-      
+
+    clear();
+    mvprintw(
+        row-2,
+        0,
+        "LOGIN_NAME_MAX on your system is: %ld ", sysconf(_SC_LOGIN_NAME_MAX));
+    mvprintw(
+        row-1,
+        0,
+        "(press any key)", sysconf(_SC_LOGIN_NAME_MAX));
+    refresh();
+    getch();
+
     clear();
     mvprintw(
         row-1,

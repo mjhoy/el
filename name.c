@@ -1,8 +1,7 @@
 #include "name.h"
+#include <limits.h>
 
-#define MAX_NAME_LEN 15
-
-static char name[MAX_NAME_LEN];
+static char name[NAME_MAX];
 
 char *
 getName()
@@ -14,7 +13,7 @@ void
 setName(char *newName)
 {
     int i;
-    for (i = 0; i < MAX_NAME_LEN && newName[i] != '\0'; i++)
+    for (i = 0; i < NAME_MAX && newName[i] != '\0'; i++)
         name[i] = newName[i];
     name[i+1] = '\0';
 }

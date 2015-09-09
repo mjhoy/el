@@ -2,7 +2,7 @@
    
  *  el  *
 
-*/
+ */
 
 #include <ncurses.h>
 #include <locale.h>
@@ -18,16 +18,6 @@
 #include "ui.h"
 #include "level1.h"
 #include "name.h"
-
-const char *main_map =
-      "                "
-      "   #########    "
-      "   #       #    "
-      "   #      0|    "
-      "   #       #    "
-      "   # L     #    "
-      "   #########    "
-      "                ";
 
 void
 tellmeaboutthedate()
@@ -79,18 +69,6 @@ setupname()
 
     clear();
     mvprintw(
-        row-2,
-        0,
-        "LOGIN_NAME_MAX on your system is: %ld ", sysconf(_SC_LOGIN_NAME_MAX));
-    mvprintw(
-        row-1,
-        0,
-        "(press any key)", sysconf(_SC_LOGIN_NAME_MAX));
-    refresh();
-    getch();
-
-    clear();
-    mvprintw(
         row-1,
         0,
         "what's your name? [%s] ", default_name);
@@ -114,7 +92,7 @@ setupname()
 
 void
 intro() {
-    char *title = "🐋   L";
+    char *title = "L";
 
     int row, col;
 

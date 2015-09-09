@@ -4,15 +4,15 @@ static FILE *logfile;
 
 void
 init_log() {
-      logfile = fopen("log", "a");
+    logfile = fopen("log", "a");
 }
 
 void
 end_log() {
-      fclose(logfile);
+    fclose(logfile);
 }
 
 FILE *
 ellogfile() {
-      return logfile;
+    return logfile;
 }

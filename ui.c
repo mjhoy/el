@@ -18,6 +18,8 @@ print_command_line(int row) {
     mvprintw(row,29,"q"); attroff(A_BOLD);
 }
 
+/* TODO move everything that doesn't have to do with calling printw()
+ * into map.c */
 void
 render_map(Map *map) {
     int maxx, maxy;

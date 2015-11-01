@@ -1,7 +1,7 @@
 #ifndef __map_h__
 #define __map_h__
 
-typedef int (*eventFn)(void *map);
+typedef int (*eventFn)(void *map, int event_pos);
 
 typedef struct Map {
     char *data;

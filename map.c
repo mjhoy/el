@@ -9,10 +9,10 @@ static void map_update_visibility(Map *map);
 int map_initial_pos(Map *map);
 
 // do nuthin event
-int noopEvent(void *_map) {
+int noopEvent(void *_map, int event_pos) {
     Map *map = (Map *)_map;
     FILE *logfile = ellogfile();
-    fprintf(logfile, "NOOP called: map %s\n", map->id);
+    fprintf(logfile, "NOOP called: map %s, pos: %i\n", map->id, event_pos);
     return 1;
 }
 
@@ -150,12 +150,15 @@ map_move(Map *map, int ch) {
         fprintf(logfile, "%d\n",temp_pos - '0');
         fprintf(logfile, "%c\n",temp_pos);
         fflush(logfile);
-        (*map->events[temp_pos - '0'])(map);
+        (*map->events[temp_pos - '0'])(map, new_pos);
+        map_update_visibility(map);
+        break;
     default:
         map->pos = new_pos;
         map_update_visibility(map);
         return 1;
     }
+    return 1;
 }
 
 /* Return the initial position of the character for `map`.

@@ -1,0 +1,9 @@
+[package]
+name = "el"
+version = "0.1.0"
+authors = ["Michael Hoy <mjh@mjhoy.com>"]
+
+[dependencies]
+ncurses = "5.73.0"
+log     = "0.3.3"
+chrono  = "0.2"

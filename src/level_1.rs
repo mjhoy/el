@@ -23,8 +23,8 @@ fn event0(m: &mut Map, event_pos: usize) -> bool {
     getch();
 
     m.pos = event_pos;
-    m.data[m.pos + 1] = ' ';
-    m.data[m.pos] = ' ';
+    // m.data[m.pos + 1] = ' ';
+    // m.data[m.pos] = ' ';
     return true;
 }
 

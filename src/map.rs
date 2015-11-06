@@ -1,9 +1,15 @@
+extern crate ncurses;
+
 use ncurses::*;
+use wall::*;
+use door::*;
+use doodad::*;
+use render::*;
 
 pub type Event = fn(&mut Map, usize) -> bool;
 
 pub struct Map {
-    pub data    : Vec<char>,
+    pub data    : Box<Vec<Option<Box<Doodad>>>>,
     pub visible : Vec<char>,
     pub w       : usize,
     pub h       : usize,
@@ -11,8 +17,11 @@ pub struct Map {
     events      : Vec<Event>
 }
 
-fn can_see_through(c: char) -> bool {
-    c != '|' && c != '#'
+fn can_see_through(c: &Option<Box<Doodad>>) -> bool {
+    match *c {
+        Some(ref x) => { x.seethrough() }
+        None => true
+    }
 }
 
 fn check_and_mark_neighbor(vis : &mut Vec<char>,
@@ -26,21 +35,30 @@ fn check_and_mark_neighbor(vis : &mut Vec<char>,
     }
 }
 
+fn char_to_doodad(c: char) -> Option<Box<Doodad>> {
+    match c {
+        '#' => Some(Box::new(Wall)),
+        '|' => Some(Box::new(Door::Vertical)),
+        '-' => Some(Box::new(Door::Horizontal)),
+        _   => None
+    }
+}
+
 impl Map {
     pub fn new(data: String, width: usize, height: usize, events: Vec<Event>) -> Map {
         let mut initial_pos = 0;
-        let mut d: Vec<char> = vec![' '; width * height];
+        let mut d: Vec<Option<Box<Doodad>>> = vec![];
         for (pos, c) in data.chars().enumerate() {
             if c == 'L' {
                 initial_pos = pos;
-                d[pos] = ' ';
+                d.push(char_to_doodad(' '));
             } else {
-                d[pos] = c;
+                d.push(char_to_doodad(c));
             }
         }
 
         let mut m1 = Map {
-            data: d.clone(),
+            data: Box::new(d),
             visible: vec![' '; width * height],
             w: width,
             h: height,
@@ -65,17 +83,17 @@ impl Map {
                 if cur_coord == self.pos {
                     printw("L");
                 } else {
-                    let cur_char = self.data[cur_coord];
-                    let print_char = match cur_char {
-                        '0' | '1' | '2' | '3' | '4' =>
-                            ' ',
-                        'L' => ' ',
-                        x => x
-                    };
-                    if self.visible[cur_coord] == 'X' {
-                        printw(&print_char.to_string());
-                    } else {
-                        printw(" ");
+                    let ref cur_dood = self.data[cur_coord];
+                    match cur_dood {
+                        &Some(ref x) => {
+                            let instr = x.draw();
+                            if self.visible[cur_coord] == 'X' {
+                                render(instr);
+                            } else {
+                                render_empty();
+                            }
+                        }
+                        &None => render_empty()
                     }
                 }
             }
@@ -97,24 +115,34 @@ impl Map {
             return false;
         }
 
-        match self.data[new_pos] {
-            '#' | '|' => false, // can't walk through walls
-            '0' |
-            '1' |
-            '2' |
-            '3' |
-            '4' => {
-                let idx : usize = self.data[new_pos].to_string().parse::<usize>().unwrap();
-                let event = self.events[idx];
-                event(self, new_pos);
-                true
+        let res = match self.data[new_pos] {
+            Some(ref x) => {
+                if x.passable() {
+                    true
+                } else {
+                    false
+                }
             }
+            // '#' | '|' => false, // can't walk through walls
+            // '0' |
+            // '1' |
+            // '2' |
+            // '3' |
+            // '4' => {
+            //     let idx : usize = self.data[new_pos].to_string().parse::<usize>().unwrap();
+            //     let event = self.events[idx];
+            //     event(self, new_pos);
+            //     true
+            // }
             _ => {
-                self.pos = new_pos;
-                self.update_visibility();
                 true
             }
+        };
+        if res {
+            self.pos = new_pos;
+            self.update_visibility();
         }
+        res
     }
 
     fn update_visibility(&mut self) {
@@ -131,7 +159,7 @@ impl Map {
                 for j in (0..w) {
                     let cur_coord = (w * i) + j;
                     let cur_char  = vis[cur_coord];
-                    if cur_char == 'X' && can_see_through(self.data[cur_coord]) {
+                    if cur_char == 'X' && can_see_through(&self.data[cur_coord]) {
 
                         let mut neighbor;
                         let mut did_mark = false;
@@ -166,3 +194,19 @@ impl Map {
     }
 }
 
+
+// -------- private tests ----------------
+
+#[test]
+fn test_check_and_mark_neighbor() {
+    let mut vis = vec![' ', ' ', ' '];
+
+    assert_eq!(check_and_mark_neighbor(&mut vis, 3), false);
+    assert_eq!(vec![' ', ' ', ' '], vis);
+
+    assert_eq!(check_and_mark_neighbor(&mut vis, 0), true);
+    assert_eq!(vec!['X', ' ', ' '], vis);
+
+    assert_eq!(check_and_mark_neighbor(&mut vis, 0), false);
+    assert_eq!(vec!['X', ' ', ' '], vis);
+}

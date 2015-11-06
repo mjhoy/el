@@ -6,6 +6,10 @@ extern crate chrono;
 mod my_log;
 mod map;
 mod level_1;
+mod doodad;
+mod wall;
+mod door;
+mod render;
 
 use ncurses::*;
 use chrono::*;
@@ -20,13 +24,14 @@ fn main() {
     setlocale(locale_conf, "en_US.UTF-8"); // if your locale is like mine(zh_CN.UTF-8)
 
     initscr();
-
+    start_color();
     intro();
 
     run_level_1();
 
     endwin();
 }
+
 
 fn intro() {
     let title = "L";

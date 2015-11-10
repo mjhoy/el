@@ -29,7 +29,8 @@ fn event0(m: &mut Map, event_pos: usize) -> bool {
 }
 
 pub fn run_level_1() {
-    let mut map = Map::new(LEVEL_1.to_string(), 18, 8, vec![event0]);
+    // let mut map = Map::new(LEVEL_1.to_string(), 18, 8, vec![event0]);
+    let mut map = map_from_str(LEVEL_1_);
 
     map.render();
 
@@ -55,3 +56,19 @@ pub fn run_level_1() {
         }
     }
 }
+
+const LEVEL_1_: &'static str = r"
+
+ #########
+ #       ########################
+ #   L   |        |             #
+ #       #######--####          #
+ #########   #    #  #          #
+             #    #  #####---####
+             ######      #   #
+                         #   #
+             #######     #   #
+             #     #######   #
+             #     |         #
+             #################
+";

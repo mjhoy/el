@@ -22,6 +22,31 @@ pub struct Map {
     events      : Vec<Event>
 }
 
+pub fn map_from_str(s: &'static str) -> Map {
+    let mut longest = 0;
+    for line in s.lines() {
+        if line.len() > longest {
+            longest = line.len();
+        }
+    }
+    let mut data_list: Vec<String> = vec![];
+
+    for line in s.lines() {
+        let line_length = line.len();
+        let to_pad = longest - line_length;
+        let mut s = String::new();
+        s.push_str(line);
+        for _ in 0..(to_pad) { s.push(' '); }
+        data_list.push(s);
+    }
+
+    let width = longest;
+    let height = s.lines().count();
+    let data = data_list.join("");
+
+    Map::new(data, width, height, vec![])
+}
+
 fn can_see_through(c: &Option<Box<Doodad>>) -> bool {
     match c {
         &Some(ref x) => { x.seethrough() }

@@ -13,6 +13,7 @@ mod render;
 
 use ncurses::*;
 use chrono::*;
+use render::*;
 
 use level_1::*;
 
@@ -25,6 +26,7 @@ fn main() {
 
     initscr();
     start_color();
+    init_colors();
     intro();
 
     run_level_1();

@@ -38,4 +38,5 @@ pub trait Doodad {
     fn draw(&self) -> DrawInstructions;
     fn passable(&self) -> bool;
     fn seethrough(&self) -> bool;
+    fn move_action(&mut self) -> () { }
 }

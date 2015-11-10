@@ -1,15 +1,20 @@
 extern crate ncurses;
 
+use std::cell::*;
+use std::rc::Rc;
+
 use ncurses::*;
 use wall::*;
 use door::*;
 use doodad::*;
 use render::*;
 
+
 pub type Event = fn(&mut Map, usize) -> bool;
 
+#[allow(dead_code)]
 pub struct Map {
-    pub data    : Box<Vec<Option<Box<Doodad>>>>,
+    pub data    : Rc<RefCell<Vec<Option<Box<Doodad>>>>>,
     pub visible : Vec<char>,
     pub w       : usize,
     pub h       : usize,
@@ -18,9 +23,9 @@ pub struct Map {
 }
 
 fn can_see_through(c: &Option<Box<Doodad>>) -> bool {
-    match *c {
-        Some(ref x) => { x.seethrough() }
-        None => true
+    match c {
+        &Some(ref x) => { x.seethrough() }
+        &None => true
     }
 }
 
@@ -38,8 +43,8 @@ fn check_and_mark_neighbor(vis : &mut Vec<char>,
 fn char_to_doodad(c: char) -> Option<Box<Doodad>> {
     match c {
         '#' => Some(Box::new(Wall)),
-        '|' => Some(Box::new(Door::Vertical)),
-        '-' => Some(Box::new(Door::Horizontal)),
+        '|' => Some(Box::new(Door { horizontal: false, open: false })),
+        '-' => Some(Box::new(Door { horizontal: true, open: false })),
         _   => None
     }
 }
@@ -58,7 +63,7 @@ impl Map {
         }
 
         let mut m1 = Map {
-            data: Box::new(d),
+            data: Rc::new(RefCell::new(d)),
             visible: vec![' '; width * height],
             w: width,
             h: height,
@@ -83,7 +88,7 @@ impl Map {
                 if cur_coord == self.pos {
                     printw("L");
                 } else {
-                    let ref cur_dood = self.data[cur_coord];
+                    let ref cur_dood = self.data.borrow()[cur_coord];
                     match cur_dood {
                         &Some(ref x) => {
                             let instr = x.draw();
@@ -115,13 +120,11 @@ impl Map {
             return false;
         }
 
-        let res = match self.data[new_pos] {
-            Some(ref x) => {
-                if x.passable() {
-                    true
-                } else {
-                    false
-                }
+        let res = match self.data.borrow_mut()[new_pos] {
+            Some(ref mut x) => {
+                let passable = x.passable();
+                x.move_action();
+                passable
             }
             // '#' | '|' => false, // can't walk through walls
             // '0' |
@@ -140,8 +143,8 @@ impl Map {
         };
         if res {
             self.pos = new_pos;
-            self.update_visibility();
         }
+        self.update_visibility();
         res
     }
 
@@ -159,7 +162,7 @@ impl Map {
                 for j in (0..w) {
                     let cur_coord = (w * i) + j;
                     let cur_char  = vis[cur_coord];
-                    if cur_char == 'X' && can_see_through(&self.data[cur_coord]) {
+                    if cur_char == 'X' && can_see_through(&self.data.borrow()[cur_coord]) {
 
                         let mut neighbor;
                         let mut did_mark = false;

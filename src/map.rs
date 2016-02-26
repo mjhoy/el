@@ -107,8 +107,8 @@ impl Map {
 
         clear();
 
-        for i in (0..h) {
-            for j in (0..w) {
+        for i in 0..h {
+            for j in 0..w {
                 let cur_coord = (w * i) + j;
                 if cur_coord == self.pos {
                     printw("L");
@@ -183,8 +183,8 @@ impl Map {
 
         while set_new {
             set_new = false;
-            for i in (0..h) {
-                for j in (0..w) {
+            for i in 0..h {
+                for j in 0..w {
                     let cur_coord = (w * i) + j;
                     let cur_char  = vis[cur_coord];
                     if cur_char == 'X' && can_see_through(&self.data.borrow()[cur_coord]) {

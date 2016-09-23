@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Michael Hoy <mjh@mjhoy.com>"]
 
 [dependencies]
-ncurses = "5.80.0"
 log     = "0.3.5"
 chrono  = "0.2.19"
+
+[dependencies.ncurses]
+git = "https://github.com/mjhoy/ncurses-static-rs"
+branch = "static-lib"
+features = ["wide"]

@@ -1,0 +1,17 @@
+el
+==
+
+a silly little project in which i practice rust fundamentals and
+explore the standard library and crates.
+
+
+install
+=======
+
+using cargo, a simple:
+
+cargo build --release
+cargo run
+
+this will take a while at first because it will build the ncurses
+library.

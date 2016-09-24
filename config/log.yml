@@ -1,0 +1,13 @@
+# see: http://sfackler.github.io/log4rs/doc/v0.4.8/log4rs/
+
+refresh_rate: 30 seconds
+
+appenders:
+  logfile:
+    kind: file
+    path: "log/el.log"
+
+root:
+  level: warn
+  appenders:
+    - logfile

@@ -1,9 +1,12 @@
-#[macro_use]
+#[macro_use] extern crate log;
+extern crate log4rs;
 extern crate ncurses;
 
 use ncurses::*;
 
 fn main() {
+    log4rs::init_file("config/log.yml", Default::default()).unwrap();
+
     let locale_conf = LcCategory::all;
     setlocale(locale_conf, "en_US.UTF-8"); // if your locale is like mine(zh_CN.UTF-8)
 

@@ -9,5 +9,4 @@ chrono  = "0.2.19"
 
 [dependencies.ncurses]
 git = "https://github.com/mjhoy/ncurses-static-rs"
-branch = "static-lib"
 features = ["wide"]

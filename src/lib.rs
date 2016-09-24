@@ -2,6 +2,7 @@
 extern crate log4rs;
 extern crate ncurses;
 
+use std::{thread, time};
 use ncurses::*;
 mod window;
 use window::*;
@@ -25,6 +26,14 @@ pub fn teardown() {
     endwin();
 }
 
+fn printw_centered(width: i32, row: i32, message: &str) {
+    mvprintw(
+        row,
+        (width - message.chars().count() as i32) / 2,
+        &format!("{}", message)
+        );
+}
+
 pub fn intro() {
     let title = "L";
 
@@ -33,19 +42,18 @@ pub fn intro() {
 
     getmaxyx(stdscr, &mut row, &mut col);
 
+    let mid_y = (row / 2) - 1;
+
     attron(A_BOLD());
-    attron(A_BOLD());
-    mvprintw(
-        (row / 2) - 1,
-        (col - (title.chars().count() as i32)) / 2,
-        &format!("{}", title));
+    printw_centered(col, mid_y, title);
     attroff(A_BOLD());
+    refresh();
 
-    mvprintw(
-        row-1,
-        0,
-        "hit a key to continue ");
-
+    thread::sleep(time::Duration::from_millis(1500));
+    printw_centered(
+        col,
+        mid_y + 1,
+        "hit the any key to continue ");
     refresh();
     getch();
 

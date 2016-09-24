@@ -3,6 +3,8 @@ extern crate log4rs;
 extern crate ncurses;
 
 use ncurses::*;
+mod window;
+use window::*;
 
 /// Starts the game. Must eventually call teardown().
 pub fn startup(log_path: Option<&str>) {
@@ -21,16 +23,6 @@ pub fn startup(log_path: Option<&str>) {
 /// Ends the game.
 pub fn teardown() {
     endwin();
-}
-
-pub fn dialog_wait() {
-    let a: WINDOW = newwin(10,10,0,0);
-    box_(a, 0, 0);
-    wrefresh(a);
-
-    let _ = getch();
-
-    delwin(a);
 }
 
 pub fn intro() {
@@ -57,8 +49,25 @@ pub fn intro() {
     refresh();
     getch();
 
-    dialog_wait();
     setupname();
+
+    let mut max_x = 0;
+    let mut max_y = 0;
+
+    getmaxyx(stdscr, &mut max_y, &mut max_x);
+
+    let field = Window::new(max_y, max_x - 25, 0, 0);
+    let console = Window::new(max_y, 25, 0, (max_x - 25));
+
+    field.refresh();
+    console.refresh();
+
+    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+    let _ = getch();
+
+    field.msg("hello there.");
+    field.refresh();
+    let _ = getch();
 }
 
 

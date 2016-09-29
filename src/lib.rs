@@ -2,110 +2,79 @@
 extern crate log4rs;
 extern crate ncurses;
 
-use std::{thread, time};
+mod doodad;
+mod player;
+mod engine;
+mod map;
+mod elconstants;
+
+use std::collections::LinkedList;
+use std::cell::RefCell;
 use ncurses::*;
-mod window;
-use window::*;
+use doodad::*;
+use player::*;
+use engine::*;
+use map::*;
+use elconstants::*;
+
+pub fn run(log_path: Option<&str>) {
+    startup(log_path);
+
+    let mut quit = false;
+    let mut input;
+
+    let mut width = 0;
+    let mut height = 0;
+    getmaxyx(stdscr, &mut height, &mut width);
+
+    let player = Player { x: 0, y: 0 };
+    let pcell = RefCell::new(player);
+
+    // Doodads are things that can be drawn.
+    let mut doodads: LinkedList<&RefCell<Doodad>> = LinkedList::new();
+
+    doodads.push_front(&pcell);
+
+    let mut map = vec![vec![Tile::open(); 20]; 20];
+
+    map[1][2] = Tile::wall();
+
+    let center = RefCell::new((0,0));
+
+    let engine = Engine::new(doodads, &pcell, &center, map);
+
+    // Game loop
+    while !quit {
+        engine.draw_tiles();
+        engine.draw();
+        input = getch();
+        if input == EL_QUIT {
+            quit = true;
+        }
+        engine.update_player_pos(input);
+        clear();
+    }
+    teardown();
+}
 
 /// Starts the game. Must eventually call teardown().
-pub fn startup(log_path: Option<&str>) {
+fn startup(log_path: Option<&str>) {
     match log_path {
         Some(p) => log4rs::init_file(p, Default::default()).unwrap(),
         None    => ()
     }
 
     let locale_conf = LcCategory::all;
-    setlocale(locale_conf, "en_US.UTF-8"); // if your locale is like mine(zh_CN.UTF-8)
+    setlocale(locale_conf, "en_US.UTF-8");
 
     initscr();
+    raw();
+    noecho();
+    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
     start_color();
 }
 
 /// Ends the game.
-pub fn teardown() {
+fn teardown() {
     endwin();
-}
-
-fn printw_centered(width: i32, row: i32, message: &str) {
-    mvprintw(
-        row,
-        (width - message.chars().count() as i32) / 2,
-        &format!("{}", message)
-        );
-}
-
-pub fn intro() {
-    let title = "L";
-
-    let mut row = 0;
-    let mut col = 0;
-
-    getmaxyx(stdscr, &mut row, &mut col);
-
-    let mid_y = (row / 2) - 1;
-
-    attron(A_BOLD());
-    printw_centered(col, mid_y, title);
-    attroff(A_BOLD());
-    refresh();
-
-    thread::sleep(time::Duration::from_millis(1500));
-    printw_centered(
-        col,
-        mid_y + 1,
-        "hit the any key to continue ");
-    refresh();
-    getch();
-
-    setupname();
-
-    let mut max_x = 0;
-    let mut max_y = 0;
-
-    getmaxyx(stdscr, &mut max_y, &mut max_x);
-
-    let field = Window::new(max_y, max_x - 25, 0, 0);
-    let console = Window::new(max_y, 25, 0, (max_x - 25));
-
-    field.refresh();
-    console.refresh();
-
-    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
-    let _ = getch();
-
-    field.msg("hello there.");
-    field.refresh();
-    let _ = getch();
-}
-
-
-fn setupname() {
-    let default_name = "mikey";
-    let mut name: String = "".to_string();
-
-    let mut row = 0;
-    let mut col = 0;
-
-    getmaxyx(stdscr, &mut row, &mut col);
-
-    // not gonna fuck around with getpwuid()...
-
-    clear();
-    mvprintw(
-        row-1,
-        0,
-        &format!("what's your name? [{}] ", default_name));
-    getstr(&mut name);
-    if name.chars().count() == 0 {
-        name = default_name.to_string();
-    }
-
-    clear();
-    mvprintw(
-        row-1,
-        0,
-        &format!("hello, {}! (hit a key to continue)", name)
-            );
-    refresh();
-    getch();
 }
